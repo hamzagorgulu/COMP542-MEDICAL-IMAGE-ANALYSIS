@@ -6,8 +6,7 @@ from utils import sharpen_img, clip_outside, show, load, filtered_connected_comp
 
 def segment(img):
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    blur = cv2.GaussianBlur(gray, (3, 3), 0)
-    sharpen = sharpen_img(blur, kernel_size=15)
+    sharpen = sharpen_img(gray, kernel_size=15)
     thr = adapt_threshold(sharpen, kernel_size=17, constant=3)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
     mask = cv2.morphologyEx(thr, cv2.MORPH_CLOSE, kernel, iterations=1)
@@ -37,7 +36,7 @@ def main():
     for img, gold in zip(imgs, golds):
         mask = segment(img)
         masks.append(mask)
-        show(img, mask)
+        show([img, mask])
 
     for mask, gold in zip(masks, golds):
         score = evaluate(mask, gold)
