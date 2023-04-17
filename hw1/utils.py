@@ -21,11 +21,11 @@ def zoom(img, zoom):
     return cv2.warpAffine(img, rot_mat, img.shape[1::-1], flags=cv2.INTER_LINEAR)
 
 
-def adapt_threshold(img):
+def adapt_threshold(img, kernel_size, constant):
     img = cv2.GaussianBlur(img, (7, 7), 0)
     # ret,thr = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
     thr = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                cv2.THRESH_BINARY, 11, 2)
+                                cv2.THRESH_BINARY, kernel_size, constant)
     return 255-thr
 
 

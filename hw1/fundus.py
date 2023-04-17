@@ -8,11 +8,12 @@ def segment(img):
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     blur = cv2.GaussianBlur(gray, (3, 3), 0)
     sharpen = sharpen_img(blur, kernel_size=15)
-    thr = adapt_threshold(sharpen)
-    kernel = np.ones((3, 3), np.uint8)
+    thr = adapt_threshold(sharpen, kernel_size=17, constant=3)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
     mask = cv2.morphologyEx(thr, cv2.MORPH_CLOSE, kernel, iterations=1)
     mask = filtered_connected_components(
         mask, connectivity=8, area_threshold=40)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel, iterations=1)
     return clip_outside(img, mask)
 
 def main():
