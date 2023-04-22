@@ -1,11 +1,16 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 def readtxt(path):
     with open(path) as file:
         img = file.readlines()
-    return np.loadtxt(img, dtype=np.uint8)
+    return np.loadtxt(img, dtype=np.uint16)
+
+def read_pickle(path):
+    with open(path, "rb") as fp:   # Unpickling
+        return pickle.load(fp)
 
 def get_cells_as_singel_objects(cells):
     cell_objects = [(cells == i+1)*1 for i in range(int(np.max(cells)))]
@@ -17,7 +22,7 @@ def get_seeds(cells, img):
     
     for cell in cells:
         coord = []
-        cell = cv2.morphologyEx(cell.astype(np.uint8), cv2.MORPH_ERODE, kernel, iterations=5)
+        cell = cv2.morphologyEx(cell.astype(np.uint8), cv2.MORPH_ERODE, kernel, iterations=1)
         activations = cell * cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         activations[activations==0] = 255
         argmin = np.unravel_index(activations.argmin(), activations.shape)
@@ -120,7 +125,7 @@ def auto_canny(image, sigma=0.05):
     return edged
 
 
-def filtered_connected_components(img, connectivity, area_threshold, seed=None):
+def filtered_connected_components(img, connectivity, area_threshold, seed=None, numerate=False):
     analysis = cv2.connectedComponentsWithStats(img,
                                                 connectivity,
                                                 cv2.CV_32S)
@@ -137,10 +142,15 @@ def filtered_connected_components(img, connectivity, area_threshold, seed=None):
         area = values[i, cv2.CC_STAT_AREA]
 
         if (area > area_threshold):
-            componentMask = (label_ids == i).astype("uint8") * 255
+            if numerate:
+                componentMask = (label_ids == i).astype("uint8") * i
+            else:
+                componentMask = (label_ids == i).astype("uint8") * 255
             if seed:
                 if componentMask[seed[0], seed[1]] == 0:
                     continue
+            if componentMask.dtype == 'uint16':
+                output = output.astype(np.uint16)
             output = cv2.bitwise_or(output, componentMask)
     return output
 
@@ -157,7 +167,7 @@ def evaluate(mask, gold):
     if np.max(gold) == 255:
         gold = cv2.threshold(gold, 0, 1, cv2.THRESH_BINARY)[1]
         
-    show(cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)*255, gold*255)
+    #show(cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)*255, gold*255)
     TP = np.sum(np.logical_and(mask == 1, gold == 1))
     TN = np.sum(np.logical_and(mask == 0, gold == 0))
     FP = np.sum(np.logical_and(mask == 1, gold == 0))
@@ -216,6 +226,8 @@ def region_grow(I, seedY, seedX, th, mask):
     return R
 
 def IoU(pred, target):
+    if np.max(pred*target) == 0:
+        return 0
     pred[pred > 0] = 1
     pred[target > 0] = 1
     TP = np.sum(np.logical_and(pred == 1, target == 1))
@@ -245,6 +257,8 @@ def evaluate_cells(predictions, targets):
         FN = len(targets) - (TP + FP)
         dice = 2*TP / (2*TP + FP + FN)
         iou = TP / (TP + FP + FN)
+        print("dice: ", dice)
+        print("iou: ", iou)
         results.append(dice)
         results.append(iou)
     return results
@@ -254,6 +268,7 @@ def evaluate_cells(predictions, targets):
 def fuse_predictions_to_print(predictions):
     output = np.zeros(predictions[0].shape + (3,), dtype="uint8")
     for pred in predictions:
+        pred = pred.astype(np.uint8)
         pred = cv2.cvtColor(pred, cv2.COLOR_GRAY2BGR)
         color = list(np.random.random(size=3) * 256)
         pred = pred * color
