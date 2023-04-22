@@ -28,7 +28,6 @@ def segment(img, mask, seed, cell):
         segments.append(out)
     # give each cell object a color for showing
     map = fuse_predictions_to_print(segments)
-    cell[seed_idx] = cell[seed_idx].astype(np.uint8)  # whx
     cell_map = fuse_predictions_to_print(cell)
     show([img, cell_map.astype(np.uint8), map])
     return segments
