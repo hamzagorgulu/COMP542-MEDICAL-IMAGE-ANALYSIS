@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
-from utils import show, load, readtxt, get_cells_as_singel_objects, get_seeds, region_grow, filtered_connected_components, evaluate_cells, fuse_predictions_to_print, read_pickle
+from utils import show, load, readtxt, get_cells_as_singel_objects, get_seeds, region_grow, filtered_connected_components, evaluate_cells, fuse_predictions_to_print, read_pickle, adapt_threshold
 
 
 def segment(img, mask, seed, cell):
     segments = []
     for seed_idx in range(len(seed)):
+        print("seed index: ", seed_idx)
         # image preprocessing
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         blured = cv2.medianBlur(gray, 3)
@@ -29,7 +30,7 @@ def segment(img, mask, seed, cell):
     # give each cell object a color for showing
     map = fuse_predictions_to_print(segments)
     cell_map = fuse_predictions_to_print(cell)
-    show([img, cell_map.astype(np.uint8), map])
+    show([img, map, cell_map.astype(np.uint8)])
     return segments
 
 
@@ -62,13 +63,16 @@ def main():
     # load from files
     for img, mask, dist, cell in zip(img_paths, mask_paths, dist_cells, gold_cell_paths):
         imgs.append(load(img, 1))
-        masks.append(readtxt(mask))
+        masks.append(read_pickle(mask))
         cells.append(readtxt(cell))
         dists.append(read_pickle(dist))
 
     # create seeds from distance transforms. Cells is processed just for visualization and score caluclation
     for img, dist, cell in zip(imgs, dists, cells):
-        dist = cv2.threshold(dist, 1, 255, cv2.THRESH_BINARY)[1]
+        #dist = cv2.morphologyEx(dist.astype(np.uint8), cv2.MORPH_ERODE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3)), iterations=1)
+        #dist = adapt_threshold(dist, 7, 0)
+        #dist = 255 - dist
+        #dist = cv2.threshold(dist, 15, 255, cv2.THRESH_BINARY)[1]
         dist = dist.astype(np.uint8)
         # connected components to get each distance transform as seperate object
         dist = filtered_connected_components(dist, 8, 1, numerate=True)

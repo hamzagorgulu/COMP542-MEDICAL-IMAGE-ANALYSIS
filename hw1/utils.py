@@ -203,6 +203,8 @@ def region_grow(I, seedY, seedX, th, mask):
       rows, cols, ch = I.shape
     else:
       rows, cols = I.shape
+    mask = cv2.threshold(mask, 1, 1, cv2.THRESH_BINARY)[1]
+    mask = cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_ERODE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5)), iterations=2)
     mask = 1 - mask
     R = -np.ones(shape=(rows, cols))
     R = R + mask
