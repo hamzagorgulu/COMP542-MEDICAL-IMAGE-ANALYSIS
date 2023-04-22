@@ -1,36 +1,37 @@
 import cv2
 import numpy as np
-from utils import show, load, readtxt, get_cells_as_singel_objects, get_seeds, get_mean_of_cell, region_grow, filtered_connected_components, evaluate_cells, fuse_predictions_to_print, read_pickle
+from utils import show, load, readtxt, get_cells_as_singel_objects, get_seeds, region_grow, filtered_connected_components, evaluate_cells, fuse_predictions_to_print, read_pickle
 
 
 def segment(img, mask, seed, cell):
     segments = []
     for seed_idx in range(len(seed)):
-        print(seed_idx)
+        # image preprocessing
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         blured = cv2.medianBlur(gray, 3)
+        # regiongrowing from seed
         out = region_grow(blured, seed[seed_idx]
                           [0], seed[seed_idx][1], 0.38, mask)
         out[out < 1] = 0
         out = out.astype(np.uint8)
-        
+        # check for leakages
         if np.sum(out) > 800:
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
             out = cv2.morphologyEx(out, cv2.MORPH_ERODE, kernel, iterations=2)
             out = filtered_connected_components(out, 8, 1, seed[seed_idx])
             out = cv2.morphologyEx(out, cv2.MORPH_DILATE, kernel, iterations=2)
+        # postprocess
         out = cv2.morphologyEx(out, cv2.MORPH_CLOSE, cv2.getStructuringElement(
             cv2.MORPH_ELLIPSE, (7, 7)), iterations=1)
         out = cv2.morphologyEx(out, cv2.MORPH_DILATE, cv2.getStructuringElement(
             cv2.MORPH_ELLIPSE, (5, 5)), iterations=1)
-        #show([blured, out, cell[cell_idx]])
         segments.append(out)
+    # give each cell object a color for showing
     map = fuse_predictions_to_print(segments)
-    cell[seed_idx] = cell[seed_idx].astype(np.uint8) # whx
+    cell[seed_idx] = cell[seed_idx].astype(np.uint8)  # whx
     cell_map = fuse_predictions_to_print(cell)
     show([img, cell_map.astype(np.uint8), map])
     return segments
-
 
 
 def main():
@@ -59,39 +60,38 @@ def main():
     dists = []
     cell_objects = []
 
+    # load from files
     for img, mask, dist, cell in zip(img_paths, gold_mask_paths, dist_cells, gold_cell_paths):
         imgs.append(load(img, 1))
         masks.append(readtxt(mask))
         cells.append(readtxt(cell))
         dists.append(read_pickle(dist))
-   # show([seeds[0]])
 
+    # create seeds from distance transforms. Cells is processed just for visualization and score caluclation
     for img, dist, cell in zip(imgs, dists, cells):
         dist = cv2.threshold(dist, 1, 255, cv2.THRESH_BINARY)[1]
         dist = dist.astype(np.uint8)
+        # connected components to get each distance transform as seperate object
         dist = filtered_connected_components(dist, 8, 1, numerate=True)
-        dist_object = get_cells_as_singel_objects(dist) #get list of images containting 1 dist in each of them
+        dist_object = get_cells_as_singel_objects(dist)
         cell_objects.append(get_cells_as_singel_objects(cell))
 
-        seed_objects = get_seeds(dist_object, img) # pass object, make it 255 each and remove morph erode
+        # take the seed im minimum intensity in the image
+        seed_objects = get_seeds(dist_object, img)
         seeds.append(seed_objects)
         for i in range(len(dist_object)):
             if dist_object[i][seed_objects[i][0], seed_objects[i][1]] != 1:
                 print("Seed and cell does not match")
 
-
+    # run segmentation algorithm
     for img, mask, seed, cell in zip(imgs, masks, seeds, cell_objects):
         output = segment(img, mask, seed, cell)
         outputs.append(output)
-        
-        
 
+    # run evaluation
     for img, out, cell in zip(imgs, outputs, cell_objects):
         score = evaluate_cells(out, cell)
         print(score)
-        # map = fuse_predictions_to_print(out)
-        # show([map])
-        
 
 
 if __name__ == "__main__":
