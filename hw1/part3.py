@@ -34,18 +34,18 @@ def segment(img, mask, seed, cell):
 
 
 def main():
-    img1_path = "hw1\\data\\im1.jpg"
-    gold1_cells_path = "hw1\\data\\im1_gold_cells.txt"
-    dist1_cells_path = "hw1\\results\\part2_dist_1"
-    gold1_mask_path = "hw1\\data\\im1_gold_mask.txt"
-    img2_path = "hw1\\data\\im2.jpg"
-    gold2_cells_path = "hw1\\data\\im2_gold_cells.txt"
-    dist2_cells_path = "hw1\\results\\part2_dist_2"
-    gold2_mask_path = "hw1\\data\\im2_gold_mask.txt"
-    img3_path = "hw1\\data\\im3.jpg"
-    gold3_cells_path = "hw1\\data\\im3_gold_cells.txt"
-    dist3_cells_path = "hw1\\results\\part2_dist_3"
-    gold3_mask_path = "hw1\\data\\im3_gold_mask.txt"
+    img1_path = "data\\im1.jpg"
+    gold1_cells_path = "data\\im1_gold_cells.txt"
+    dist1_cells_path = "results\\part2_dist_1"
+    gold1_mask_path = "data\\im1_gold_mask.txt"
+    img2_path = "data\\im2.jpg"
+    gold2_cells_path = "data\\im2_gold_cells.txt"
+    dist2_cells_path = "results\\part2_dist_2"
+    gold2_mask_path = "data\\im2_gold_mask.txt"
+    img3_path = "data\\im3.jpg"
+    gold3_cells_path = "data\\im3_gold_cells.txt"
+    dist3_cells_path = "results\\part2_dist_3"
+    gold3_mask_path = "data\\im3_gold_mask.txt"
 
     img_paths = [img1_path, img2_path, img3_path]
     gold_cell_paths = [gold1_cells_path, gold2_cells_path, gold3_cells_path]
