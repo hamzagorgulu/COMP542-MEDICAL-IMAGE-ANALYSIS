@@ -1,10 +1,9 @@
 import cv2
-import imutils
 import pickle
 import numpy as np
 from skimage import color
 import matplotlib.pyplot as plt
-from utils_v2 import clip_img, find_center, xy_image, evaluate_part2, evaluate_part2_v2, evaluate, check_set
+from utils_v2 import clip_img, find_center, xy_image, evaluate_part2_v2, evaluate, check_set
 
 def enhance_sharpness(log_image, g_image):
     log_image = np.absolute(log_image)
@@ -104,13 +103,8 @@ def FindCellLocations(image, mask):
     for i in range(len(contours)):
         cv2.drawContours(markers, contours, i, (i+1), -1)
 
-    #cv2.waitKey(0)
-
-    #cnts = cv2.findContours(im_th, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    #cnts = imutils.grab_contours(cnts)
     xy = [find_center(c) for c in contours]
-    #cv2.waitKey(0)
-    #breakpoint()
+
     return xy, distance
 
 def main():
