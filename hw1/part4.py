@@ -20,12 +20,12 @@ def segment(img):
     return clip_outside(img, mask)
 
 def main():
-    img1_path = "hw1\\fundus\\d4_h.jpg"
-    gold1_path = "hw1\\fundus\\d4_h_gold.png"
-    img2_path = "hw1\\fundus\\d7_dr.jpg"
-    gold2_path = "hw1\\fundus\\d7_dr_gold.png"
-    img3_path = "hw1\\fundus\\d11_g.jpg"
-    gold3_path = "hw1\\fundus\\d11_g_gold.png"
+    img1_path = "fundus\\d4_h.jpg"
+    gold1_path = "fundus\\d4_h_gold.png"
+    img2_path = "fundus\\d7_dr.jpg"
+    gold2_path = "fundus\\d7_dr_gold.png"
+    img3_path = "fundus\\d11_g.jpg"
+    gold3_path = "fundus\\d11_g_gold.png"
 
     img_paths = [img1_path, img2_path, img3_path]
     gold_paths = [gold1_path, gold2_path, gold3_path]
