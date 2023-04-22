@@ -66,7 +66,7 @@ def FindCellLocations(image, mask):
     #cv2.imshow("log_image after np clipped", log_image)
 
 
-    im_th = cv2.threshold(sharp_im, 160, 255, cv2.THRESH_BINARY)[1]
+    im_th = cv2.threshold(sharp_im, 150, 255, cv2.THRESH_BINARY)[1]
     #cv2.imshow("sharp_im after thresholding:imt_th", im_th)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
@@ -82,10 +82,10 @@ def FindCellLocations(image, mask):
     cv2.normalize(distance, distance, 0, 255, cv2.NORM_MINMAX)
     #cv2.imshow("after distance transform to cells", distance)
 
-    distance = cv2.erode(distance, kernel, iterations =2)
+    distance = cv2.erode(distance, kernel, iterations =3)
     #cv2.imshow("after eroding", distance)
 
-    distance = cv2.morphologyEx(distance, cv2.MORPH_OPEN, kernel, iterations = 1)
+    distance = cv2.morphologyEx(distance, cv2.MORPH_OPEN, kernel, iterations = 3)
     #cv2.imshow("after morphological opening", distance)
 
 
