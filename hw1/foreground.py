@@ -17,7 +17,7 @@ def obtain_foreground(img):
     #mask = filtered_connected_components(mask, connectivity=500, area_threshold=400)
     #breakpoint()
     
-    return clip_outside(img, mask)
+    return mask
 
 def main():
     im1_path = "data/im1.jpg"
