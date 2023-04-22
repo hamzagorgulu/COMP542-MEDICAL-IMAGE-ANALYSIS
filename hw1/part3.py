@@ -37,19 +37,19 @@ def main():
     img1_path = "data\\im1.jpg"
     gold1_cells_path = "data\\im1_gold_cells.txt"
     dist1_cells_path = "results\\part2_dist_1"
-    gold1_mask_path = "data\\im1_gold_mask.txt"
+    mask1_path = "data\\mask_0"
     img2_path = "data\\im2.jpg"
     gold2_cells_path = "data\\im2_gold_cells.txt"
     dist2_cells_path = "results\\part2_dist_2"
-    gold2_mask_path = "data\\im2_gold_mask.txt"
+    mask2_path = "data\\mask_1"
     img3_path = "data\\im3.jpg"
     gold3_cells_path = "data\\im3_gold_cells.txt"
     dist3_cells_path = "results\\part2_dist_3"
-    gold3_mask_path = "data\\im3_gold_mask.txt"
+    mask3_path = "data\\mask_2"
 
     img_paths = [img1_path, img2_path, img3_path]
     gold_cell_paths = [gold1_cells_path, gold2_cells_path, gold3_cells_path]
-    gold_mask_paths = [gold1_mask_path, gold2_mask_path, gold3_mask_path]
+    mask_paths = [mask1_path, mask2_path, mask3_path]
     dist_cells = [dist1_cells_path, dist2_cells_path, dist3_cells_path]
     imgs = []
     masks = []
@@ -60,7 +60,7 @@ def main():
     cell_objects = []
 
     # load from files
-    for img, mask, dist, cell in zip(img_paths, gold_mask_paths, dist_cells, gold_cell_paths):
+    for img, mask, dist, cell in zip(img_paths, mask_paths, dist_cells, gold_cell_paths):
         imgs.append(load(img, 1))
         masks.append(readtxt(mask))
         cells.append(readtxt(cell))
